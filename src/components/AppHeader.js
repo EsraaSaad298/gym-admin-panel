@@ -10,6 +10,7 @@ import {
   CHeaderToggler,
   CNavLink,
   CNavItem,
+  CAvatar,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilBell, cilEnvelopeOpen, cilList, cilMenu } from '@coreui/icons'
@@ -17,6 +18,7 @@ import { cilBell, cilEnvelopeOpen, cilList, cilMenu } from '@coreui/icons'
 import { AppBreadcrumb } from './index'
 import { AppHeaderDropdown } from './header/index'
 import { logo } from 'src/assets/brand/logo'
+import gym_logo from '../assets/images/gym_logo.png'
 
 const AppHeader = () => {
   const dispatch = useDispatch()
@@ -36,15 +38,7 @@ const AppHeader = () => {
         </CHeaderBrand>
         <CHeaderNav className="d-none d-md-flex me-auto">
           <CNavItem>
-            <CNavLink to="/dashboard" component={NavLink}>
-              Dashboard
-            </CNavLink>
-          </CNavItem>
-          <CNavItem>
-            <CNavLink href="#">Users</CNavLink>
-          </CNavItem>
-          <CNavItem>
-            <CNavLink href="#">Settings</CNavLink>
+            <img src={gym_logo} alt="Logo" style={{ width: '100px', marginLeft: '20px' }}></img>
           </CNavItem>
         </CHeaderNav>
         <CHeaderNav>
@@ -67,10 +61,6 @@ const AppHeader = () => {
         <CHeaderNav className="ms-3">
           <AppHeaderDropdown />
         </CHeaderNav>
-      </CContainer>
-      <CHeaderDivider />
-      <CContainer fluid>
-        <AppBreadcrumb />
       </CContainer>
     </CHeader>
   )

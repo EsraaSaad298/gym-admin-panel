@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
   CButton,
   CCard,
@@ -10,239 +10,158 @@ import {
   CFormLabel,
   CFormTextarea,
   CRow,
+  CDropdownMenu,
+  CDropdownItem,
+  CDropdown,
+  CDropdownToggle,
 } from '@coreui/react'
 import { DocsExample } from 'src/components'
+import { useNavigate, useLocation } from 'react-router-dom'
+import PropTypes from 'prop-types'
 
-const FormControl = () => {
+//prettier-ignore
+const FormControl = (props) => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { client } = location.state;
+  const [full_name, setFullName] = useState(client? client.full_name : "");
+  const [address, setAddress] = useState(client? client.address : "");
+  const [mobile_number, setMobileNumber] = useState(client? client.mobile_number : "");
+  const [subscription_type, setSubscriptionType] = useState(client? client.subscription_plan : "");
+
+  const submitForm = () => {
+    var data = {
+      full_name: full_name,
+      address: address,
+      mobile_number: mobile_number,
+      subscription_plan: subscription_type,
+      avatar: ""
+    }
+
+    fetch("https://64103182e1212d9cc92c334f.mockapi.io/api/gym/clients", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data), // Replace 'data' with the actual data object you want to send
+    })
+      .then(response => response.json())
+      .then(data => {
+        // Handle the response data
+        console.log(data);
+        navigate("/dashboard")
+      })
+      .catch(error => {
+        // Handle any errors that occurred during the request
+        console.error(error);
+      });
+  };
+
+  const updateForm = async (data) => {
+    var data = {
+      full_name: full_name,
+      address: address,
+      mobile_number: mobile_number,
+      subscription_plan: subscription_type,
+      avatar: ""
+    }
+    
+    fetch(`https://64103182e1212d9cc92c334f.mockapi.io/api/gym/clients/${client.id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data), // Replace 'data' with the actual data object you want to send
+    })
+      .then(response => response.json())
+      .then(data => {
+        // Handle the response data
+        console.log(data);
+        navigate("/dashboard")
+      })
+      .catch(error => {
+        // Handle any errors that occurred during the request
+        console.error(error);
+      });
+  };
+
   return (
     <CRow>
       <CCol xs={12}>
         <CCard className="mb-4">
-          <CCardHeader>
-            <strong>React Form Control</strong>
-          </CCardHeader>
           <CCardBody>
-            <DocsExample href="forms/form-control">
               <CForm>
                 <div className="mb-3">
-                  <CFormLabel htmlFor="exampleFormControlInput1">Email address</CFormLabel>
+                  <CFormLabel htmlFor="exampleFormControlInput1">Full Name</CFormLabel>
                   <CFormInput
-                    type="email"
                     id="exampleFormControlInput1"
-                    placeholder="name@example.com"
+                    placeholder="Example Name"
+                    value={full_name}
+                    onChange={(data_obj) => setFullName(data_obj.target.value)}
                   />
                 </div>
                 <div className="mb-3">
-                  <CFormLabel htmlFor="exampleFormControlTextarea1">Example textarea</CFormLabel>
-                  <CFormTextarea id="exampleFormControlTextarea1" rows="3"></CFormTextarea>
-                </div>
-              </CForm>
-            </DocsExample>
-          </CCardBody>
-        </CCard>
-      </CCol>
-      <CCol xs={12}>
-        <CCard className="mb-4">
-          <CCardHeader>
-            <strong>React Form Control</strong> <small>Sizing</small>
-          </CCardHeader>
-          <CCardBody>
-            <p className="text-medium-emphasis small">
-              Set heights using <code>size</code> property like <code>size=&#34;lg&#34;</code> and{' '}
-              <code>size=&#34;sm&#34;</code>.
-            </p>
-            <DocsExample href="forms/form-control#sizing">
-              <CFormInput
-                type="text"
-                size="lg"
-                placeholder="Large input"
-                aria-label="lg input example"
-              />
-              <br />
-              <CFormInput
-                type="text"
-                placeholder="Default input"
-                aria-label="default input example"
-              />
-              <br />
-              <CFormInput
-                type="text"
-                size="sm"
-                placeholder="Small input"
-                aria-label="sm input example"
-              />
-            </DocsExample>
-          </CCardBody>
-        </CCard>
-      </CCol>
-      <CCol xs={12}>
-        <CCard className="mb-4">
-          <CCardHeader>
-            <strong>React Form Control</strong> <small>Disabled</small>
-          </CCardHeader>
-          <CCardBody>
-            <p className="text-medium-emphasis small">
-              Add the <code>disabled</code> boolean attribute on an input to give it a grayed out
-              appearance and remove pointer events.
-            </p>
-            <DocsExample href="forms/form-control#disabled">
-              <CFormInput
-                type="text"
-                placeholder="Disabled input"
-                aria-label="Disabled input example"
-                disabled
-              />
-              <br />
-              <CFormInput
-                type="text"
-                placeholder="Disabled readonly input"
-                aria-label="Disabled input example"
-                disabled
-                readOnly
-              />
-              <br />
-            </DocsExample>
-          </CCardBody>
-        </CCard>
-      </CCol>
-      <CCol xs={12}>
-        <CCard className="mb-4">
-          <CCardHeader>
-            <strong>React Form Control</strong> <small>Readonly</small>
-          </CCardHeader>
-          <CCardBody>
-            <p className="text-medium-emphasis small">
-              Add the <code>readOnly</code> boolean attribute on an input to prevent modification of
-              the input&#39;s value. Read-only inputs appear lighter (just like disabled inputs),
-              but retain the standard cursor.
-            </p>
-            <DocsExample href="forms/form-control#readonly">
-              <CFormInput
-                type="text"
-                placeholder="Readonly input here..."
-                aria-label="readonly input example"
-                readOnly
-              />
-            </DocsExample>
-          </CCardBody>
-        </CCard>
-      </CCol>
-      <CCol xs={12}>
-        <CCard className="mb-4">
-          <CCardHeader>
-            <strong>React Form Control</strong> <small>Readonly plain text</small>
-          </CCardHeader>
-          <CCardBody>
-            <p className="text-medium-emphasis small">
-              If you want to have <code>&lt;input readonly&gt;</code> elements in your form styled
-              as plain text, use the <code>plainText</code> boolean property to remove the default
-              form field styling and preserve the correct margin and padding.
-            </p>
-            <DocsExample href="components/accordion">
-              <CRow className="mb-3">
-                <CFormLabel htmlFor="staticEmail" className="col-sm-2 col-form-label">
-                  Email
-                </CFormLabel>
-                <div className="col-sm-10">
+                  <CFormLabel htmlFor="exampleFormControlInput1">Mobile Number</CFormLabel>
                   <CFormInput
-                    type="text"
-                    id="staticEmail"
-                    defaultValue="email@example.com"
-                    readOnly
-                    plainText
+                    type='phone-number'
+                    id="exampleFormControlInput1"
+                    placeholder="Mobile number"
+                    value={mobile_number}
+                    onChange={(data_obj) => setMobileNumber(data_obj.target.value)}
                   />
                 </div>
-              </CRow>
-              <CRow className="mb-3">
-                <CFormLabel htmlFor="inputPassword" className="col-sm-2 col-form-label">
-                  Password
-                </CFormLabel>
-                <div className="col-sm-10">
-                  <CFormInput type="password" id="inputPassword" />
+                <div className="mb-3">
+                  <CFormLabel htmlFor="exampleFormControlTextarea1">Address</CFormLabel>
+                  <CFormTextarea id="exampleFormControlTextarea1" rows="3" value={address} onChange={(data_obj) => setAddress(data_obj.target.value)} ></CFormTextarea>
                 </div>
-              </CRow>
-            </DocsExample>
-            <DocsExample href="components/accordion">
-              <CForm className="row g-3">
-                <div className="col-auto">
-                  <CFormLabel htmlFor="staticEmail2" className="visually-hidden">
-                    Email
-                  </CFormLabel>
-                  <CFormInput
-                    type="text"
-                    id="staticEmail2"
-                    defaultValue="email@example.com"
-                    readOnly
-                    plainText
-                  />
-                </div>
-                <div className="col-auto">
-                  <CFormLabel htmlFor="inputPassword2" className="visually-hidden">
-                    Password
-                  </CFormLabel>
-                  <CFormInput type="password" id="inputPassword2" placeholder="Password" />
-                </div>
-                <div className="col-auto">
-                  <CButton type="submit" className="mb-3">
-                    Confirm identity
-                  </CButton>
+                <div className="mb-3" style={{ display: "flex", alignItems: "flex-start", flexDirection: "column"}}>
+                  <CFormLabel htmlFor="exampleFormControlTextarea1">Subscription Plan</CFormLabel>
+                  <CDropdown>
+                    <CDropdownToggle color="primary">{subscription_type == "" ? "Choose Plan" : subscription_type}</CDropdownToggle>
+                    <CDropdownMenu>
+                      <CDropdownItem onClick={() => setSubscriptionType("Basic Plan")} >Basic Plan</CDropdownItem>
+                      <CDropdownItem onClick={() => setSubscriptionType("Subscription plan 110")}>Subscription plan 110</CDropdownItem>
+                      <CDropdownItem onClick={() => setSubscriptionType("Subscription plan 111")}>Subscription plan 111</CDropdownItem>
+                    </CDropdownMenu>
+                  </CDropdown>
                 </div>
               </CForm>
-            </DocsExample>
           </CCardBody>
         </CCard>
       </CCol>
-      <CCol xs={12}>
-        <CCard className="mb-4">
-          <CCardHeader>
-            <strong>React Form Control</strong> <small>File input</small>
-          </CCardHeader>
-          <CCardBody>
-            <DocsExample href="forms/form-control#file-input">
-              <div className="mb-3">
-                <CFormLabel htmlFor="formFile">Default file input example</CFormLabel>
-                <CFormInput type="file" id="formFile" />
-              </div>
-              <div className="mb-3">
-                <CFormLabel htmlFor="formFileMultiple">Multiple files input example</CFormLabel>
-                <CFormInput type="file" id="formFileMultiple" multiple />
-              </div>
-              <div className="mb-3">
-                <CFormLabel htmlFor="formFileDisabled">Disabled file input example</CFormLabel>
-                <CFormInput type="file" id="formFileDisabled" disabled />
-              </div>
-              <div className="mb-3">
-                <CFormLabel htmlFor="formFileSm">Small file input example</CFormLabel>
-                <CFormInput type="file" size="sm" id="formFileSm" />
-              </div>
-              <div>
-                <CFormLabel htmlFor="formFileLg">Large file input example</CFormLabel>
-                <CFormInput type="file" size="lg" id="formFileLg" />
-              </div>
-            </DocsExample>
-          </CCardBody>
-        </CCard>
-      </CCol>
-      <CCol xs={12}>
-        <CCard className="mb-4">
-          <CCardHeader>
-            <strong>React Form Control</strong> <small>Color</small>
-          </CCardHeader>
-          <CCardBody>
-            <DocsExample href="forms/form-control#color">
-              <CFormLabel htmlFor="exampleColorInput">Color picker</CFormLabel>
-              <CFormInput
-                type="color"
-                id="exampleColorInput"
-                defaultValue="#563d7c"
-                title="Choose your color"
-              />
-            </DocsExample>
-          </CCardBody>
-        </CCard>
-      </CCol>
+      <div className="mb-3" style={{ display: "flex", alignItems: "center", justifyContent: "center"}}>
+        {client ? 
+          <CButton color="primary" size="md"
+           style={{
+             alignSelf: "center",
+             marginTop: "10px",
+             display: "flex",
+             justifyContent: "center",
+           }} onClick={() => updateForm()}>
+               Edit client data 
+          </CButton>
+        :
+          <CButton color="primary" size="md"
+          style={{
+            alignSelf: "center",
+            marginTop: "10px",
+            display: "flex",
+            justifyContent: "center",
+          }} onClick={() => submitForm()}>
+              Submit client data 
+          </CButton>
+        }
+      </div>
     </CRow>
   )
 }
 
 export default FormControl
+
+FormControl.propTypes = {
+  location: PropTypes.shape({
+    state: PropTypes.shape({
+      client: PropTypes.object.isRequired,
+    }).isRequired,
+  }).isRequired,
+}

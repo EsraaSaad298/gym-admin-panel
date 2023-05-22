@@ -1,89 +1,203 @@
-import PropTypes from 'prop-types'
-import React, { useEffect, useState, createRef } from 'react'
-import classNames from 'classnames'
-import { CRow, CCol, CCard, CCardHeader, CCardBody } from '@coreui/react'
-import { rgbToHex } from '@coreui/utils'
-import { DocsLink } from 'src/components'
+import React, { useState, useEffect } from 'react'
 
-const ThemeView = () => {
-  const [color, setColor] = useState('rgb(255, 255, 255)')
-  const ref = createRef()
+import {
+  CAvatar,
+  CButton,
+  CButtonGroup,
+  CCard,
+  CCardBody,
+  CCardFooter,
+  CCardHeader,
+  CCol,
+  CProgress,
+  CRow,
+  CTable,
+  CTableBody,
+  CTableDataCell,
+  CTableHead,
+  CTableHeaderCell,
+  CTableRow,
+} from '@coreui/react'
+import { CChartLine } from '@coreui/react-chartjs'
+import { getStyle, hexToRgba } from '@coreui/utils'
+import CIcon from '@coreui/icons-react'
+import {
+  cibCcAmex,
+  cibCcApplePay,
+  cibCcMastercard,
+  cibCcPaypal,
+  cibCcStripe,
+  cibCcVisa,
+  cibGoogle,
+  cibFacebook,
+  cibLinkedin,
+  cifBr,
+  cifEs,
+  cifFr,
+  cifIn,
+  cifPl,
+  cifUs,
+  cibTwitter,
+  cilCloudDownload,
+  cilPeople,
+  cilUser,
+  cilUserFemale,
+} from '@coreui/icons'
+
+import avatar1 from 'src/assets/images/avatars/1.jpg'
+import avatar2 from 'src/assets/images/avatars/2.jpg'
+import avatar3 from 'src/assets/images/avatars/3.jpg'
+import avatar4 from 'src/assets/images/avatars/4.jpg'
+import avatar5 from 'src/assets/images/avatars/5.jpg'
+import avatar6 from 'src/assets/images/avatars/6.jpg'
+import placeholder from 'src/assets/images/placeholder.png'
+
+import { FaEye, FaEdit, FaTrash } from 'react-icons/fa'
+import { useNavigate } from 'react-router-dom'
+import { Button, Modal } from 'react-bootstrap'
+
+// prettier-ignore
+const Colors = () => {
+  const [data, setData] = useState([]);
+  const avatarSources = [avatar1, avatar2, avatar3, avatar4, avatar5, avatar6];
+
+  const [showModal, setShowModal] = useState(false);
+  const [delete_record, setDeleteRecord] = useState("");
+  const handleClose = () => {
+    setShowModal(!showModal);
+  };
+
+  const handleDelete = () => {
+    fetch(`https://64103182e1212d9cc92c334f.mockapi.io/api/gym/classes/${delete_record}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then((response) => {
+        if (response.ok) {
+          // Delete operation successful
+          // Perform any necessary actions (e.g., update state)
+          console.log('Record deleted successfully');
+          fetchData();
+          setShowModal(!showModal);
+        } else {
+          // Delete operation failed
+          throw new Error('Failed to delete record');
+        }
+      })
+      .catch((error) => {
+        // Handle any error that occurred during the delete request
+        console.error('Error deleting record:', error);
+      });
+  };
+
+  const fetchData = async () => {
+    try {
+      const response = await fetch('https://64103182e1212d9cc92c334f.mockapi.io/api/gym/classes');
+      const jsonData = await response.json();
+      jsonData.forEach((data_entry, index) => {
+        if (
+          typeof data_entry.image !== 'string' ||
+          data_entry.image === '' ||
+          Object.keys(data_entry.avatar).length === 0
+        ) {
+          data_entry.image = { src: placeholder, status: 'placeholder' };
+        } else {
+          data_entry.image = { src: avatarSources[index], status: 'success' };
+        }
+
+        for (let key in data_entry) {
+          if (data_entry.hasOwnProperty(key) && !data_entry[key]) {
+            data_entry[key] = "-";
+          }
+        }
+      });        
+      setData(jsonData);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
 
   useEffect(() => {
-    const el = ref.current.parentNode.firstChild
-    const varColor = window.getComputedStyle(el).getPropertyValue('background-color')
-    setColor(varColor)
-  }, [ref])
+    fetchData();
+  }, []);
 
-  return (
-    <table className="table w-100" ref={ref}>
-      <tbody>
-        <tr>
-          <td className="text-medium-emphasis">HEX:</td>
-          <td className="font-weight-bold">{rgbToHex(color)}</td>
-        </tr>
-        <tr>
-          <td className="text-medium-emphasis">RGB:</td>
-          <td className="font-weight-bold">{color}</td>
-        </tr>
-      </tbody>
-    </table>
-  )
-}
+  const navigate = useNavigate();
 
-const ThemeColor = ({ className, children }) => {
-  const classes = classNames(className, 'theme-color w-75 rounded mb-3')
-  return (
-    <CCol xs={12} sm={6} md={4} xl={2} className="mb-4">
-      <div className={classes} style={{ paddingTop: '75%' }}></div>
-      {children}
-      <ThemeView />
-    </CCol>
-  )
-}
+  const handleViewButton = (client) => {
+    navigate('/class', { state: { client } });
+  };
 
-ThemeColor.propTypes = {
-  children: PropTypes.node,
-  className: PropTypes.string,
-}
+  const handleEditButton = (client) => {
+    navigate('/class-form', { state: { client } });
+  };
 
-const Colors = () => {
   return (
     <>
-      <CCard className="mb-4">
-        <CCardHeader>
-          Theme colors
-          <DocsLink href="https://coreui.io/docs/utilities/colors/" />
-        </CCardHeader>
-        <CCardBody>
-          <CRow>
-            <ThemeColor className="bg-primary">
-              <h6>Brand Primary Color</h6>
-            </ThemeColor>
-            <ThemeColor className="bg-secondary">
-              <h6>Brand Secondary Color</h6>
-            </ThemeColor>
-            <ThemeColor className="bg-success">
-              <h6>Brand Success Color</h6>
-            </ThemeColor>
-            <ThemeColor className="bg-danger">
-              <h6>Brand Danger Color</h6>
-            </ThemeColor>
-            <ThemeColor className="bg-warning">
-              <h6>Brand Warning Color</h6>
-            </ThemeColor>
-            <ThemeColor className="bg-info">
-              <h6>Brand Info Color</h6>
-            </ThemeColor>
-            <ThemeColor className="bg-light">
-              <h6>Brand Light Color</h6>
-            </ThemeColor>
-            <ThemeColor className="bg-dark">
-              <h6>Brand Dark Color</h6>
-            </ThemeColor>
-          </CRow>
-        </CCardBody>
-      </CCard>
+      <CTable align="middle" className="mb-0 border" hover responsive>
+        <CTableHead color="light">
+          <CTableRow>
+            <CTableHeaderCell>Class name</CTableHeaderCell>
+            <CTableHeaderCell className="text-center">Coach name</CTableHeaderCell>
+            <CTableHeaderCell>Timing</CTableHeaderCell>
+            <CTableHeaderCell className="text-center">Price</CTableHeaderCell>
+            <CTableHeaderCell>Actions</CTableHeaderCell>
+          </CTableRow>
+        </CTableHead>
+        <CTableBody>
+          {data.map((item, index) => (
+            <CTableRow v-for="item in tableItems" key={index}>
+              <CTableDataCell>
+                <div>{item.title}</div>
+              </CTableDataCell>
+              <CTableDataCell className="text-center">
+                <div>{item.coach_name}</div>
+              </CTableDataCell>
+              <CTableDataCell>
+                <div>{item.timing}</div>
+              </CTableDataCell>
+              <CTableDataCell className="text-center">
+                <div>{item.price}</div>
+              </CTableDataCell>
+              <CTableDataCell>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <FaEye style={{ color: 'black' }} onClick={() => handleViewButton(item)} /> {/* View Icon */}
+                  <FaEdit style={{ color: 'black' }} onClick={() => handleEditButton(item)} /> {/* Edit Icon */}
+                  <FaTrash style={{ color: '#e6005c' }} onClick={() => [
+                      setDeleteRecord(item.id), 
+                      setShowModal(true)
+                  ]} /> {/* Delete Icon */}
+                </div>
+              </CTableDataCell>
+            </CTableRow>
+          ))}
+        </CTableBody>
+      </CTable>
+      <CButton color="primary" size="md"
+      style={{
+        alignSelf: "center",
+        marginTop: "30px",
+        display: "flex",
+        justifyContent: "center",
+      }} onClick={() => navigate('/forms/layout', { state: {} })}>
+          Add Class
+      </CButton>
+
+      <Modal show={showModal} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Deletion</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Are you sure you want to delete this class record?</Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>
+            Cancel
+          </Button>
+          <Button variant="danger" onClick={handleDelete}>
+            Delete
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </>
   )
 }

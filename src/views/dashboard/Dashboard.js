@@ -183,7 +183,7 @@ const Dashboard = () => {
         marginTop: "30px",
         display: "flex",
         justifyContent: "center",
-      }} onClick={() => navigate('/forms', { state: {} })}>
+      }} onClick={() => navigate('/client-form', { state: {} })}>
           Add Client
       </CButton>
 

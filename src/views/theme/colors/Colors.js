@@ -180,7 +180,7 @@ const Colors = () => {
         marginTop: "30px",
         display: "flex",
         justifyContent: "center",
-      }} onClick={() => navigate('/forms/layout', { state: {} })}>
+      }} onClick={() => navigate('/class-form', { state: {} })}>
           Add Class
       </CButton>
 
